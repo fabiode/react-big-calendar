@@ -86,5 +86,7 @@ export default function withDragAndDrop(Calendar, {
     onEventDrop: React.PropTypes.func
   }
 
+
+
   return DragDropContext(backend)(DragAndDropCalendar);
 }

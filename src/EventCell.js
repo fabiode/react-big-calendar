@@ -4,6 +4,8 @@ import dates from './utils/dates';
 import { accessor, elementType } from './utils/propTypes';
 import { accessor as get } from './utils/accessors';
 
+import Tappable from 'react-tappable';//
+
 let propTypes = {
   event: React.PropTypes.object.isRequired,
   slotStart: React.PropTypes.instanceOf(Date),
@@ -36,6 +38,7 @@ class EventCell extends React.Component {
       , eventWrapperComponent: EventWrapper
       , ...props } = this.props;
 
+
     let title = get(event, titleAccessor)
       , end = get(event, endAccessor)
       , start = get(event, startAccessor)
@@ -58,12 +61,25 @@ class EventCell extends React.Component {
           })}
           onClick={(e) => onSelect(event, e)}
         >
-          <div className='rbc-event-content' title={title}>
-            { Event
-              ? <Event event={event} title={title}/>
-              : title
-            }
-          </div>
+            <Tappable
+                preventDefault
+                stopPropagation
+                onTap={
+                    () => {
+                        console.log('tapped');
+                    onSelect(event);
+                    }
+                }
+                className='rbc-event-content'
+                title={title}
+            >
+                <div className='rbc-event-content' title={title}>
+                    { Event
+                        ? <Event event={event} title={title}/>
+                        : title
+                    }
+                </div>
+            </Tappable>
         </div>
       </EventWrapper>
     );

@@ -115,7 +115,13 @@ class BackgroundCells extends React.Component {
     })
 
     selector
-      .on('click', point => {
+      .on('click', (point, e) => {
+          // Hack.  This works around ghost clicks firing after a tap.
+           if (e && /rbc\-event\-content/.test(e.target.className)){
+             console.log('hacky ghostclick return')
+               return;
+           }
+
         if (!isEvent(findDOMNode(this), point)) {
           let rowBox = getBoundsForNode(node)
           let { range, rtl } = this.props;

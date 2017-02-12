@@ -90,7 +90,6 @@ class Selection {
   }
 
   _mouseDown (e) {
-    console.log('mouse down')
     var node = this.container()
       , collides, offsetData;
 
@@ -137,9 +136,6 @@ class Selection {
   }
 
   _mouseUp(e) {
-
-      console.log('mouse up')
-
     this._onMouseUpListener && this._onMouseUpListener.remove();
     this._onMouseMoveListener && this._onMouseMoveListener.remove();
 

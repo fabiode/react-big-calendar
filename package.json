@@ -3,7 +3,7 @@
   "version": "0.12.3",
   "description": "Forked from react-big-calendar. Added touch events and replaced html5 backend with touch backend. WIP and currently very buggy.",
   "author": "Jason Quense <monastic.panic@gmail.com>",
-  "repository": "intljusticemission/react-big-calendar",
+  "repository": "lucidsif/react-big-calendar-touch",
   "license": "MIT",
   "main": "lib/index.js",
   "style": "lib/css/react-big-calendar.css",

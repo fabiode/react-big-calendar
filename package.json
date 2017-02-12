@@ -85,6 +85,7 @@
     "dom-helpers": "^2.3.0 || ^3.0.0",
     "invariant": "^2.1.0",
     "lodash": "^4.17.4",
+    "react-dnd-touch-backend": "^0.3.5",
     "react-overlays": "^0.6.0",
     "react-prop-types": "^0.4.0",
     "react-tappable": "^0.8.4",

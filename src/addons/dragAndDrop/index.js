@@ -5,15 +5,14 @@ import cn from 'classnames';
 import DraggableEventWrapper from './DraggableEventWrapper'
 import { DayWrapper, DateCellWrapper } from './backgroundWrapper'
 
-let html5Backend;
+let touchBackend;
 
 try {
-  html5Backend = require('react-dnd-html5-backend')
+  touchBackend = require('react-dnd-touch-backend')
 } catch (err) { /* optional dep missing */}
 
-
 export default function withDragAndDrop(Calendar, {
-  backend = html5Backend
+  backend = touchBackend
 } = {}) {
 
   class DragAndDropCalendar extends React.Component {

@@ -1,6 +1,6 @@
 {
   "name": "react-big-calendar-touch",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "description": "Forked from react-big-calendar. Created a touch version of the dradAndDrop add-on.",
   "author": "Jason Quense <monastic.panic@gmail.com>",
   "repository": "lucidsif/react-big-calendar-touch",

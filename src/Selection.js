@@ -28,15 +28,25 @@ class Selection {
 
     this._listeners = Object.create(null);
 
-      //
+    // events for mouse
     this._mouseDown = this._mouseDown.bind(this)
     this._mouseUp = this._mouseUp.bind(this)
     this._openSelector = this._openSelector.bind(this)
     this._keyListener = this._keyListener.bind(this)
 
+    // events for touch
+    this._touchStart = this._touchStart.bind(this);
+    this._touchEnd = this._touchEnd.bind(this);
+    this._openSelectorTouch = this._openSelectorTouch.bind(this);
+
+    // listeners for mouse
     this._onMouseDownListener = addEventListener('mousedown', this._mouseDown)
     this._onKeyDownListener = addEventListener('keydown', this._keyListener)
     this._onKeyUpListener = addEventListener('keyup', this._keyListener)
+
+    // listeners for touch
+    this._onTouchStartListener = addEventListener('touchstart', this._touchStart);
+    this._onTouchEndListener = addEventListener('touchend', this._touchEnd);
   }
 
   on(type, handler) {
@@ -69,6 +79,8 @@ class Selection {
     this._onMouseMoveListener && this._onMouseMoveListener.remove();
     this._onKeyUpListener && this._onKeyUpListener.remove();
     this._onKeyDownListener && this._onKeyDownListener.remove()
+    this._onTouchStartListener && this._onTouchStartListener.remove();
+    this._onTouchEndListener && this._onTouchEndListener.remove();
   }
 
   isSelected(node){
@@ -135,6 +147,48 @@ class Selection {
     this._onMouseMoveListener = addEventListener('mousemove', this._openSelector)
   }
 
+  _touchStart(e) {
+    var pageX = e.changedTouches[0].screenX,
+        pageY = e.changedTouches[0].screenY,
+        clientX = e.changedTouches[0].clientX,
+        clientY = e.changedTouches[0].clientY,
+        node = this.container(),
+        collides,
+        offsetData;
+
+    if (!this.globalMouse && node && !contains(node, e.target)) {
+
+      let { top, left, bottom, right } = normalizeDistance(0);
+
+      offsetData = getBoundsForNode(node);
+
+      collides = objectsCollide({
+        top: offsetData.top - top,
+        left: offsetData.left - left,
+        bottom: offsetData.bottom + bottom,
+        right: offsetData.right + right
+      },
+      { top: e.pageY, left: e.pageX });
+
+      if (!collides) return;
+    }
+
+    let result = this.emit('mousedown', this._mouseDownData = {
+      x: pageX,
+      y: pageY,
+      clientX: clientX,
+      clientY: clientY
+    });
+
+    if (result === false)
+      return;
+
+    //e.preventDefault();
+
+    this._onTouchEndListener = addEventListener('touchend', this._touchEnd)
+    this._onTouchMoveListener = addEventListener('touchmove', this._openSelectorTouch)
+  }
+
   _mouseUp(e) {
     this._onMouseUpListener && this._onMouseUpListener.remove();
     this._onMouseMoveListener && this._onMouseMoveListener.remove();
@@ -166,6 +220,41 @@ class Selection {
     this.selecting = false;
   }
 
+  _touchEnd(e) {
+    this._onTouchMoveListener && this._onTouchMoveListener.remove();
+
+    var pageX = e.changedTouches[0].screenX,
+        pageY = e.changedTouches[0].screenY,
+        clientX = e.changedTouches[0].clientX,
+        clientY = e.changedTouches[0].clientY
+
+    if (!this._mouseDownData) return;
+
+    var inRoot = !this.container || contains(this.container(), e.target);
+    var bounds = this._selectRect;
+    var click = this.isClick(e.pageX, e.pageY);
+
+    this._mouseDownData = null
+
+    if(click && !inRoot) {
+      return this.emit('reset')
+    }
+
+    if(click && inRoot)
+      return this.emit('click', {
+        x: pageX,
+        y: pageY,
+        clientX: clientX,
+        clientY: clientY,
+      })
+
+    // User drag-clicked in the Selectable area
+    if(!click)
+      return this.emit('select', bounds)
+
+    this.selecting = false;
+  }
+
   _openSelector(e) {
     var { x, y } = this._mouseDownData;
     var w = Math.abs(x - e.pageX);
@@ -187,6 +276,38 @@ class Selection {
         left,
         x: e.pageX,
         y: e.pageY,
+        right: left + w,
+        bottom: top + h
+      });
+  }
+
+  _openSelectorTouch(e) {
+    var pageX = e.changedTouches[0].screenX,
+        pageY = e.changedTouches[0].screenY
+
+    var { x, y } = this._mouseDownData;
+    var w = Math.abs(x - e.pageX);
+    var h = Math.abs(y - e.pageY);
+
+    let left = Math.min(e.pageX, x)
+      , top = Math.min(e.pageY, y)
+      , old = this.selecting;
+
+    this.selecting = true;
+
+    if (!old) {
+      this.emit('selectStart', this._mouseDownData)
+    } else {
+      e.preventDefault()
+    }
+
+
+    if (!this.isClick(pageX, pageY))
+      this.emit('selecting', this._selectRect = {
+        top,
+        left,
+        x: pageX,
+        y: pageY,
         right: left + w,
         bottom: top + h
       });
